@@ -3,7 +3,7 @@ class truth::enforcer {
     $groupname = "$company_platform:$company_role"
     case $groupname {
         "Eucalyptus:Twissandra" : {
-            include twissandra
+            include twissandra 
         }
     }
     case $company_role {
