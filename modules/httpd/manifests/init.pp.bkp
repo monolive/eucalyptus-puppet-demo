@@ -1,0 +1,50 @@
+class http::install {
+    package{"httpd":
+        ensure => latest
+    }
+    package{"openssh-clients":
+        ensure => latest
+    }
+}
+ 
+class http::config {
+    File{
+        require => Class["http::install"],
+        notify  => Class["http::service"],
+        owner   => "root",
+        group   => "root",
+        mode    => 644
+    }
+ 
+    file{"/etc/httpd/conf.d/httpd.conf":
+            source => "puppet:///modules/http/httpd.conf";
+ 
+    }
+}
+
+class http::update-nginx {
+    include nginx::setup
+    file{"/tmp/.nginxconf_rsa.pub":
+         source => "puppet:///modules/http/nginxconf_rsa.pub",
+         owner   => "root",
+         group   => "root",
+         mode    => 600
+    }
+    exec { "update_nginx_conf":
+         path    => ['/usr/bin','/bin'],
+         command => "echo $hostname | ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /tmp/.nginxconf_rsa.pub nginxconf@load-balancer '/bin/cat >> /home/nginxconf/serverlist.local'",
+         notify  => Class["nginx::setup"]
+    }    
+}
+ 
+class http::service {
+    service{"httpd":
+        ensure  => running,
+        enable  => true,
+        require => Class["http::config"],
+    }
+}
+ 
+class http {
+    include http::install, http::config, http::service, http::update-nginx
+}
