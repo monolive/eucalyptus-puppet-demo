@@ -25,8 +25,12 @@ class cassandra::config {
     }
  
     file{"/etc/cassandra/conf/cassandra-env.sh":
-            source => "puppet:///modules/cassandra/cassandra-env.sh";
+        source  => "puppet:///modules/cassandra/cassandra-env.sh";
  
+    }
+    file{"/lib/jamm-0.2.5.jar":
+        ensure  => 'link',
+        target  => '/usr/share/cassandra/lib/jamm-0.2.5.jar',
     }
 }
  
