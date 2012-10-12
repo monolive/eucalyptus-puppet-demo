@@ -1,7 +1,8 @@
 class twissandra::install_rpm {
-    $twissandra_package = ['git','gcc','python-devel']
+    $twissandra_package = ['git','gcc','python-devel','python-setuptools']
     package { $twissandra_package:
         ensure      => latest,
+        require     => Class[Cassandra],
     }
 }
 
@@ -36,7 +37,7 @@ class twissandra::patch {
 class twissandra::install_twiss {
     exec { "install_twissandra":
         command => "pip install -U -r twissandra/requirements.txt",
-        require => Class["twissandra::config"],
+        require => Class["twissandra::patch"],
         path    => "/usr/bin",
         cwd     => "/usr/local",
     }
@@ -46,4 +47,5 @@ class twissandra {
     include cassandra
     include twissandra::install_prereq, twissandra::install_twiss, twissandra::install_rpm, twissandra::patch
 }
+
 
