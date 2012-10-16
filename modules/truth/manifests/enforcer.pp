@@ -1,9 +1,9 @@
 class truth::enforcer {
     include ntp
-    $groupname = "$company_platform:$company_role"
+    $groupname = "$company_cloud:$company_role"
     case $groupname {
-        "Eucalyptus:Twissandra" : {
-            include twissandra 
+        "Eucalyptus:Cassandra" : {
+            include twissandra
         }
     }
     case $company_role {
