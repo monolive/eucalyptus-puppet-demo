@@ -67,10 +67,11 @@ class twissandra::config {
 class twissandra::run {
     if $company_seederip == 'Yes' {
         exec {"populate_twissandra":
-            command =>  "/usr/bin/python /usr/local/twissandra/manage.py sync_cassandra",
-            path    => "/usr/bin",
+            command =>  "/usr/bin/python /usr/local/twissandra/manage.py sync_cassandra && /bin/touch /usr/local/twissandra/sync_done",
+            path    => "/usr/bin:/bin",
             require => Class["twissandra::config"],
             before  => Exec["start_twissandra"],
+            onlyif  => "test ! -f /usr/local/twissandra/sync_done",
         }
     }
 
@@ -84,7 +85,7 @@ class twissandra::run {
 class twissandra {
     require twissandra::params
     include twissandra::grab_twiss, twissandra::install_twiss, twissandra::install_rpm, twissandra::config, twissandra::run, cassandra
-    Class['twissandra::install_rpm'] -> Class['twissandra::grab_twiss'] -> Class['twissandra::install_twiss'] -> Class['twissandra::config'] -> Class['twissandra::run']
+    Class['cassandra'] -> Class['twissandra::install_rpm'] -> Class['twissandra::grab_twiss'] -> Class['twissandra::install_twiss'] -> Class['twissandra::config'] -> Class['twissandra::run']
 }
 
 
