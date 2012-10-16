@@ -13,6 +13,13 @@ class cassandra::install {
         ensure  => latest,
         require => Class["cassandra::repo"],
     }
+    file{"/etc/init.d/cassandra":
+        source  => "puppet:///modules/cassandra/cassandra",
+        owner   => "root",
+        group   => "root",
+        mode    => 755,
+        require => Package["apache-cassandra11"],
+    }
 }
 
  
@@ -21,12 +28,11 @@ class cassandra::config {
         require => Class["cassandra::install"],
         owner   => "cassandra",
         group   => "cassandra",
-        mode    => 644,
+        mode    => 755,
     }
     file{"/etc/cassandra/conf/cassandra-env.sh":
         source  => "puppet:///modules/cassandra/cassandra-env.sh",
         notify  => Class["cassandra::service"],
-        mode    => 755,
     }
     file{"/lib/jamm-0.2.5.jar":
         ensure  => 'link',
@@ -50,6 +56,7 @@ class cassandra::service {
         ensure  => running,
         enable  => true,
         require => Class["cassandra::cassandra_yaml"],
+        hasrestart  => true,
     }
 }
 
